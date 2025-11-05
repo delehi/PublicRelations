@@ -1,0 +1,122 @@
+This file contains the remaining sections of the Libft learning guide.
+
+-----------------------------------
+### PART 2: ADDITIONAL FUNCTIONS (CONTINUED)
+-----------------------------------
+
+**5. `ft_strtrim(char const *s1, char const *set)`**
+
+- **Purpose**: To trim away leading and trailing characters from a string `s1` that are present in the `set` string.
+- **Example**: `ft_strtrim("__--hello--__", "_-")` should return `"hello"`.
+- **Return Value**: A new, freshly allocated string with the characters trimmed.
+- **Your Code's Logic**:
+    1. It first finds the starting point by looping from the beginning of `s1` and skipping all characters that are in `set`.
+    2. It then finds the ending point by looping from the end of `s1` backwards, skipping all characters that are in `set`.
+    3. Once it knows the start and end index of the "good" part of the string, it uses your `ft_substr` function to create a new string containing just that part. This is another excellent example of re-using your own code.
+
+**6. `ft_strmapi(char const *s, char (*f)(unsigned int, char))`**
+
+- **Purpose**: To create a new string by applying a function `f` to every character of an existing string `s`.
+- **Genius-Level Concept: Function Pointers**: This is one of the most powerful ideas in C. The second parameter, `char (*f)(unsigned int, char)`, is a **function pointer**. It's a variable that holds the memory address of a function. This allows you to pass functions as arguments to other functions, making your code incredibly flexible and abstract.
+- **How it works**: `ft_strmapi` doesn't know or care *what* the function `f` does. It only knows that `f` is a function that takes an `unsigned int` (the index) and a `char` and returns a `char`. You could pass a function that converts to uppercase, a function that shifts every character by one (like a Caesar cipher), or anything else you can imagine.
+- **Your Code's Logic**:
+    1. It allocates memory for a new string the same size as the original.
+    2. It loops through the original string `s`.
+    3. In each iteration, it calls the function pointer `f`, passing it the current index `i` and the current character `s[i]`. 
+    4. It stores the character returned by `f` into the new string at the same index.
+    5. It returns the newly created and mapped string.
+
+**7. `ft_split(char const *s, char c)`**
+
+- **Purpose**: To split a string `s` into an array of new strings, using the character `c` as a delimiter. This is often considered the most difficult function in the project.
+- **Return Value**: `char **` - This is a "pointer to a pointer to a char". It represents a `NULL`-terminated array of strings. Think of it as an array where each element is a `char *` (a string).
+- **Mental Model**: Imagine `"hello world friend"` split by `' '`.
+    - You need an array to hold the pointers: `[ptr1, ptr2, ptr3, NULL]`
+    - `ptr1` needs to point to a new block of memory holding `"hello"`.
+    - `ptr2` needs to point to a new block of memory holding `"world"`.
+    - `ptr3` needs to point to a new block of memory holding `"friend"`.
+    - This requires multiple `malloc`s: one for the main array, and one for each word.
+- **Your Code's Logic**:
+    1. **`count_words`**: It first has a helper function to loop through `s` once just to count how many words will be produced. This is essential to know how much memory to `malloc` for the main `char **` array.
+    2. **Main `malloc`**: It allocates memory for the main array: `malloc( (word_count + 1) * sizeof(char *) )`. The `+1` is for the final `NULL` pointer that terminates the array.
+    3. **Main Loop**: It then loops through the input string `s` again.
+    4. **Inside the Loop**:
+        - It skips any leading delimiters (`c`).
+        - When it finds the start of a word, it uses another helper function (`word_len`) to find its length.
+        - It `malloc`s space for that specific word (`word_len + 1`).
+        - It copies the word into the new space.
+        - It puts the pointer to this new word into the main `char **` array.
+        - It advances the main string pointer past the word it just copied.
+    5. **Termination**: After the loop, it sets the last element of the main `char **` array to `NULL`.
+- **Error Handling**: A genius-level implementation of `ft_split` must be able to handle a `malloc` failing at any point. If you have already allocated 5 words and the 6th `malloc` fails, you must `free` the first 5 words *and* the main array before returning `NULL`. This prevents memory leaks.
+
+-----------------------------------
+### BONUS PART: LINKED LISTS
+-----------------------------------
+
+**The Big Idea: The `struct` and Self-Referential Pointers**
+
+A linked list is a fundamental data structure. Unlike an array, its elements are not stored next to each other in memory. Instead, each element (called a "node") is a separate piece of memory that contains two things:
+1.  The **data** (in your case, `void *content`).
+2.  A **pointer** to the next node in the sequence (`struct s_list *next`).
+
+Think of it like a scavenger hunt: each clue (`node`) tells you a piece of information (`content`) and where to find the next clue (`next`). The last clue points to `NULL`, indicating the end of the hunt.
+
+**`t_list` struct**: Your struct is defined as:
+`typedef struct s_list { void *content; struct s_list *next; } t_list;`
+- The `void *content` is powerful. It means you can store a pointer to *any* type of data in your list: a string, an integer, another struct, etc.
+- The `struct s_list *next` is the magic. It's a pointer that points to another struct of the *same type*. This is how you form the chain.
+
+---
+
+**1. `ft_lstnew(void *content)`**
+
+- **Purpose**: To create a single, new list node.
+- **Logic**: It `malloc`s space for one `t_list` struct, sets its `content` to the value you passed, and sets its `next` pointer to `NULL` (because a new node isn't connected to anything yet).
+
+**2. `ft_lstadd_front(t_list **lst, t_list *new)`**
+
+- **Purpose**: To add a new node to the very beginning of a list.
+- **Genius-Level Concept: Pointer to a Pointer (`**`)**: Why `t_list **lst`? The `lst` variable in your `main` function is a pointer that holds the address of the *first* node. To change which node is first, you need to change the value of that pointer itself. If you only passed `t_list *lst`, you would be passing a *copy* of the pointer, and changing the copy inside the function would do nothing to the original in `main`. By passing a pointer to the pointer (`**lst`), you are giving the function the address of your main `lst` pointer, allowing it to change what it points to.
+- **Logic**:
+    1. It takes the `new` node.
+    2. It sets the `new` node's `next` pointer to be the current first element of the list (`*lst`).
+    3. It then changes the list's head pointer (`*lst`) to point to the `new` node, making it the new front.
+
+**3. `ft_lstsize(t_list *lst)`**
+
+- **Purpose**: To count the number of nodes in a list.
+- **Logic**: It starts a counter at 0. It loops through the list, following the `next` pointers, and increments the counter for each node until it reaches `NULL`.
+
+**4. `ft_lstlast(t_list *lst)`**
+
+- **Purpose**: To find a pointer to the very last node in the list.
+- **Logic**: It loops through the list, following the `next` pointers, until `lst->next` is `NULL`. When it is, you know you are on the last node, and you return the pointer to it.
+
+**5. `ft_lstadd_back(t_list **lst, t_list *new)`**
+
+- **Purpose**: To add a new node to the very end of a list.
+- **Logic**:
+    1. It first checks if the list is empty (`*lst == NULL`). If it is, adding to the back is the same as adding to the front, so it just makes `*lst` point to `new`.
+    2. If the list is not empty, it uses `ft_lstlast(*lst)` to get a pointer to the last node.
+    3. It then sets the `next` pointer of that last node to point to `new`.
+
+**6. `ft_lstdelone(t_list *lst, void (*del)(void*))`**
+
+- **Purpose**: To delete and free a single node.
+- **Logic**: It takes a node `lst` and a function pointer `del`. It calls `del(lst->content)` to free the memory of the content, and then it calls `free(lst)` to free the memory of the node structure itself.
+
+**7. `ft_lstclear(t_list **lst, void (*del)(void*))`**
+
+- **Purpose**: To delete and free an entire list.
+- **Logic**: It loops through the list. In each iteration, it saves a pointer to the *next* node, then uses `ft_lstdelone` to delete the *current* node, and then moves to the next node it saved. This prevents you from trying to access `lst->next` after `lst` has already been freed.
+
+**8. `ft_lstiter(t_list *lst, void (*f)(void *))`**
+
+- **Purpose**: To apply a function `f` to the content of every node in the list.
+- **Logic**: It loops through the list and, for each node, it calls `f(lst->content)`.
+
+**9. `ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))`**
+
+- **Purpose**: To create a *new* list which is the result of applying function `f` to every node of the old list.
+- **Logic**: This is the most complex list function. It iterates through the original list. For each node, it applies the function `f` to the content. It then uses `ft_lstnew` to create a new node with this new content. It adds this new node to the back of the new list it is building. Crucially, if any memory allocation fails at any point, it must call `ft_lstclear` to free all the nodes it has created so far for the new list, preventing memory leaks.

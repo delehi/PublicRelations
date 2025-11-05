@@ -1,0 +1,65 @@
+Welcome to your C Programming Playground!
+
+This file contains a series of problems designed to help you practice and deepen your understanding of C, especially the concepts covered in Libft. Remember, the goal is to think, experiment, and learn from getting stuck.
+
+--------------------------------------------------------------------------------
+### PROBLEM SET 1: FUNDAMENTALS & BASIC DATA STRUCTURES
+--------------------------------------------------------------------------------
+
+**Problem 1: Simple String Concatenation (`ft_strcat_custom`)**
+
+*   **Task**: Implement a function `char *ft_strcat_custom(char *dest, const char *src)` that appends the `src` string to the `dest` string, overwriting the null byte at the end of `dest`, and then adds a new null byte. The `dest` string must have enough space for the result. The function should return the original `dest` pointer.
+
+*   **Concepts to Practice**: String traversal, null terminator (`\0`), pointer arithmetic, in-place modification.
+
+*   **Hints to Get You Started**:
+    *   You need to find the end of the `dest` string first. How do you know where a C string ends?
+    *   Once you're at the null terminator of `dest`, you can start copying characters from `src`.
+    *   Don't forget to add a new null terminator at the very end of the combined string.
+    *   **If Stuck, Research**: "C string concatenation", "`strcat` implementation", "pointer arithmetic in C".
+
+---
+
+**Problem 2: Basic Memory Duplication (`ft_memdup`)**
+
+*   **Task**: Implement a function `void *ft_memdup(const void *src, size_t n)` that allocates new memory on the heap and copies `n` bytes from the memory area `src` into this new memory area. The function should return a pointer to the newly allocated memory, or `NULL` if allocation fails.
+
+*   **Concepts to Practice**: Heap memory allocation (`malloc`), `void *` pointers, `ft_memcpy` (or `memcpy`), error handling for `malloc`.
+
+*   **Hints to Get You Started**:
+    *   How much memory do you need to allocate? (Think `n` bytes).
+    *   What function do you use to request memory from the heap?
+    *   What should you do immediately after calling `malloc`?
+    *   Once memory is allocated, how do you copy the bytes from `src` to your new memory block?
+    *   **If Stuck, Research**: "`malloc` usage in C", "`void` pointers and casting", "`memcpy` function".
+
+---
+
+**Problem 3: Linked List Node Deletion by Content (`ft_lstremove_if`)**
+
+*   **Task**: Implement a function `void ft_lstremove_if(t_list **lst, void *data_ref, int (*cmp)(void *, void *), void (*del)(void *))` that removes all nodes from the list `*lst` whose `content` matches `data_ref`, using the comparison function `cmp`. The `del` function should be used to free the content of the removed nodes.
+
+*   **Concepts to Practice**: Linked list traversal, modifying `next` pointers, `t_list **` (pointer to pointer), function pointers (`cmp`, `del`), memory management (`ft_lstdelone`).
+
+*   **Hints to Get You Started**:
+    *   You need to iterate through the list, but you also need to keep track of the *previous* node so you can re-link the list when a node is removed.
+    *   Consider the edge case where the head of the list itself needs to be removed. This is where the `t_list **lst` parameter is crucial.
+    *   If a node is removed, don't forget to `free` its content and the node itself using `ft_lstdelone`.
+    *   **If Stuck, Research**: "Deleting node from linked list C", "double pointers in linked lists", "function pointers for comparison".
+
+---
+
+**Problem 4: String Reversal (`ft_strrev`)**
+
+*   **Task**: Implement a function `char *ft_strrev(char *str)` that reverses a null-terminated string `str` in place. The function should return the original `str` pointer.
+
+*   **Concepts to Practice**: String traversal, in-place modification, two-pointer technique, swapping values.
+
+*   **Hints to Get You Started**:
+    *   First, you need to find the length of the string.
+    *   Use two pointers: one starting at the beginning of the string and one at the end.
+    *   Swap the characters pointed to by these two pointers.
+    *   Move the pointers towards the middle until they meet or cross.
+    *   **If Stuck, Research**: "C string reverse in place", "two-pointer algorithm string".
+
+Good luck! Take your time, experiment, and don't be afraid to make mistakes. That's how you learn.
